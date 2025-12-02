@@ -11,7 +11,7 @@ This utility runs on **https://black.qmp-media.nl/** and includes:
   - **fade-transition** – fade-out at :59 and fade-in at :00 (OLED-friendly)
 - A **show-seconds** toggle
 - Full persistence via `localStorage` (except fullscreen state)
-- Optional **NoSleep.js** to prevent the display from sleeping
+- **NoSleep.js** to prevent the display from sleeping
 
 Everything is intentionally minimal so the monitor stays as dark as possible.
 
@@ -93,3 +93,4 @@ The page is designed to be extremely dark and stable, avoiding:
 ## License
 This project is licensed under the MIT License.  
 See the `LICENSE` file for full text.
+
