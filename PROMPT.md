@@ -230,10 +230,40 @@ The functional design does not enforce how exactly you use NoSleep, but a typica
 
 ---
 
+### Favicon Requirements
+
+The generated HTML file must include a complete favicon set embedded directly in the `<head>` as Base64-encoded PNGs.
+
+Requirements:
+
+- Favicons must use the following exact resolutions:
+  - 8×8
+  - 12×12
+  - 16×16
+  - 32×32
+  - 48×48
+  - 64×64
+  - 128×128
+- All favicon images must be:
+  - Pure black (`#000000`)
+  - Fully opaque (no alpha transparency)
+  - Valid PNG files
+  - Embedded using Base64 data URLs (no external files)
+- For each size, generate a `<link rel="icon">` tag of the form:
+
+  ` <link rel="icon" type="image/png" sizes="WxH" href="data:image/png;base64,..."> `
+
+- The `<link rel="icon">` tags must appear in the `<head>` section, grouped together, and placed after all meta tags but before any `<style>` block.
+- The tool must not rely on any external favicon files. Everything must be inline.
+- If a browser requests a favicon in any of the standard sizes, one of these inline variants must satisfy it.
+
+You must automatically generate the base64-encoded PNGs for all listed sizes, and insert the correct `<link>` tags into the final HTML output.
+
+---
+
 ## Output format to the user
 
 When you receive a request to generate this tool, your response must be structured as:
-
 
 1. A single code block containing the entire HTML file:
 
