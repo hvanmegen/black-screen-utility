@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <!-- Source: https://github.com/hvanmegen/black-screen-utility -->
-
   <meta charset="utf-8">
   <title>Black Screen Utility – Minimal Fullscreen Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -58,7 +57,6 @@
       color: #fff;
     }
 
-    /* suboptions */
     .sub {
       margin-left: 1.5rem;
     }
@@ -72,7 +70,7 @@
       display: none;
       opacity: 0;
       user-select: none;
-      transition: opacity 0s; /* dynamically overridden */
+      transition: opacity 0s;
     }
   </style>
 </head>
@@ -113,8 +111,8 @@
 
   /* === STATE === */
   let timerActive = false;
-  let transitionMode = "none";   // none | slide | fade
-  let showSeconds = true;        // new feature
+  let transitionMode = "none";
+  let showSeconds = true;
   let lastSecond = -1;
 
   /* === FULLSCREEN === */
@@ -264,6 +262,20 @@
     setTimeout(moveTimer, 20);
     timer.style.opacity = 1;
   }
+
+  let noSleep = new NoSleep();
+  let wakeLockEnabled = false;
+
+  function enableWakeLock() {
+    if (!wakeLockEnabled) {
+      noSleep.enable();
+      wakeLockEnabled = true;
+    }
+  }
+
+  document.addEventListener("click", enableWakeLock, { once: true });
+  document.addEventListener("keydown", enableWakeLock, { once: true });
+
 </script>
 
 </body>
