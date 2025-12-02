@@ -54,6 +54,7 @@ This can prevent monitor sleep after the first user interaction if enabled.
 
 ## SEO
 The `<head>` block includes:
+- 100% black favicons in multiple resolutions as inline images
 - description  
 - keywords  
 - canonical URL  
@@ -91,3 +92,4 @@ Use **fade-transition** for OLED panels.
 
 ## License
 MIT License — see `LICENSE` for details.
+
