@@ -234,7 +234,12 @@ The functional design does not enforce how exactly you use NoSleep, but a typica
 
 When you receive a request to generate this tool, your response must be structured as:
 
-1. A single code block containing the entire HTML file
+
+1. A single code block containing the entire HTML file:
+
+   - Start with ` ` `html  
+   - End with ` ` `  
+
 2. After that code block, a short explanatory text section telling the user:
 
    - That the HTML expects a file named `nosleep.min.js` to exist in the same directory.
