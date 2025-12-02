@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Source: https://github.com/hvanmegen/black-screen-utility -->
+
+  <meta charset="utf-8">
+  <title>Black Screen Utility – Minimal Fullscreen Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO -->
+  <meta name="description"
+        content="A minimal fullscreen black page with optional clock, slide or fade transitions, second display dimming mode and no-sleep integration.">
+  <meta name="keywords"
+        content="black screen, fullscreen black, dim monitor, dark screen, qmp media">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://black.qmp-media.nl/">
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Black Screen Utility – Minimal Fullscreen Page">
+  <meta property="og:description"
+        content="A clean fullscreen black page with optional dim clock overlay and transitions.">
+  <meta property="og:url" content="https://black.qmp-media.nl/">
+  <meta property="og:type" content="website">
+
+  <!-- Local NoSleep -->
+  <script src="nosleep.min.js"></script>
+
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: system-ui, sans-serif;
+      user-select: none;
+    }
+
+    #menu {
+      position: fixed;
+      background: #111;
+      border: 1px solid #aaa;
+      color: #aaa;
+      padding: 0.7rem 1.4rem;
+      font-size: 0.9rem;
+      display: none;
+      z-index: 1000;
+      cursor: default;
+      border-radius: 2em;
+      user-select: none;
+    }
+
+    #menu div {
+      padding: 0.4rem 0.2rem;
+    }
+
+    #menu div:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    /* suboptions */
+    .sub {
+      margin-left: 1.5rem;
+    }
+
+    #timer {
+      position: fixed;
+      font-size: 2rem;
+      color: rgba(255,255,255,0.1);
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+      opacity: 0;
+      user-select: none;
+      transition: opacity 0s; /* dynamically overridden */
+    }
+  </style>
+</head>
+<body>
+
+<div id="menu">
+  <div onclick="toggleFullscreen()">Toggle Fullscreen</div>
+  <div onclick="toggleTimer()">Show Time</div>
+
+  <div id="slideOption" class="sub" onclick="setTransitionMode('slide')" style="display:none;">
+    slide-transition
+  </div>
+
+  <div id="fadeOption" class="sub" onclick="setTransitionMode('fade')" style="display:none;">
+    fade-transition
+  </div>
+
+  <div id="secondsOption" class="sub" onclick="toggleSeconds()" style="display:none;">
+    show-seconds
+  </div>
+
+  <div onclick="hideMenu()">Hide Menu</div>
+</div>
+
+<div id="timer"></div>
+
+<script>
+  /* === STORAGE === */
+  const STORAGE_KEY = "blackScreenSettings";
+
+  /* === ELEMENTS === */
+  const menu = document.getElementById("menu");
+  const timer = document.getElementById("timer");
+
+  const slideOpt = document.getElementById("slideOption");
+  const fadeOpt = document.getElementById("fadeOption");
+  const secondsOpt = document.getElementById("secondsOption");
+
+  /* === STATE === */
+  let timerActive = false;
+  let transitionMode = "none";   // none | slide | fade
+  let showSeconds = true;        // new feature
+  let lastSecond = -1;
+
+  /* === FULLSCREEN === */
+  function toggleFullscreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+    }
+    hideMenu();
+  }
+
+  /* === MENU === */
+  function hideMenu() { menu.style.display = "none"; }
+
+  document.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    menu.style.display = "block";
+    menu.style.left = e.clientX + "px";
+    menu.style.top = e.clientY + "px";
+  });
+
+  document.addEventListener("click", hideMenu);
+  document.addEventListener("dblclick", toggleFullscreen);
+
+  /* === LOCAL STORAGE === */
+  function saveSettings() {
+    const data = {
+      timerActive,
+      transitionMode,
+      showSeconds
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+
+      if (typeof data.timerActive === "boolean") timerActive = data.timerActive;
+      if (["none","slide","fade"].includes(data.transitionMode)) transitionMode = data.transitionMode;
+      if (typeof data.showSeconds === "boolean") showSeconds = data.showSeconds;
+
+    } catch {}
+  }
+
+  /* === TRANSITIONS === */
+  function applyTransitionMode() {
+    slideOpt.style.fontWeight = (transitionMode === "slide") ? "bold" : "normal";
+    fadeOpt.style.fontWeight  = (transitionMode === "fade")  ? "bold" : "normal";
+
+    if (transitionMode === "slide") {
+      timer.style.transition = "left 59s ease-in-out, top 59s ease-in-out, opacity 0s";
+    } else if (transitionMode === "fade") {
+      timer.style.transition = "opacity 1s";
+    } else {
+      timer.style.transition = "opacity 0s";
+      timer.style.opacity = 1;
+    }
+  }
+
+  function setTransitionMode(mode) {
+    transitionMode = (transitionMode === mode) ? "none" : mode;
+    applyTransitionMode();
+    saveSettings();
+  }
+
+  /* === SECONDS TOGGLE === */
+  function toggleSeconds() {
+    showSeconds = !showSeconds;
+    secondsOpt.style.fontWeight = showSeconds ? "bold" : "normal";
+    saveSettings();
+  }
+
+  /* === TIMER === */
+  function toggleTimer() {
+    timerActive = !timerActive;
+
+    slideOpt.style.display   = timerActive ? "block" : "none";
+    fadeOpt.style.display    = timerActive ? "block" : "none";
+    secondsOpt.style.display = timerActive ? "block" : "none";
+
+    secondsOpt.style.fontWeight = showSeconds ? "bold" : "normal";
+
+    if (timerActive) {
+      timer.style.display = "block";
+      setTimeout(moveTimer, 20);
+      timer.style.opacity = 1;
+    } else {
+      timer.style.opacity = 0;
+      setTimeout(() => { timer.style.display = "none"; }, 1000);
+    }
+
+    saveSettings();
+    hideMenu();
+  }
+
+  function moveTimer() {
+    const w = timer.offsetWidth;
+    const h = timer.offsetHeight;
+
+    const maxX = window.innerWidth - w;
+    const maxY = window.innerHeight - h;
+
+    timer.style.left = Math.random() * maxX + "px";
+    timer.style.top  = Math.random() * maxY + "px";
+  }
+
+  function formatTime(d) {
+    if (showSeconds) return d.toLocaleTimeString();
+    return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+  }
+
+  /* === LOOP === */
+  setInterval(() => {
+    if (!timerActive) return;
+
+    const now = new Date();
+    const sec = now.getSeconds();
+
+    timer.textContent = formatTime(now);
+
+    if (sec !== lastSecond) {
+      if (transitionMode === "fade") {
+        if (sec === 59) timer.style.opacity = 0;
+        if (sec === 0) { moveTimer(); requestAnimationFrame(() => timer.style.opacity = 1); }
+      } else if (transitionMode === "slide") {
+        if (sec === 0) moveTimer();
+      } else {
+        if (sec === 0) moveTimer();
+      }
+
+      lastSecond = sec;
+    }
+  }, 250);
+
+  /* === INIT === */
+  loadSettings();
+  applyTransitionMode();
+
+  if (timerActive) {
+    timer.style.display = "block";
+    slideOpt.style.display = fadeOpt.style.display = secondsOpt.style.display = "block";
+    secondsOpt.style.fontWeight = showSeconds ? "bold" : "normal";
+    setTimeout(moveTimer, 20);
+    timer.style.opacity = 1;
+  }
+</script>
+
+</body>
+</html>
