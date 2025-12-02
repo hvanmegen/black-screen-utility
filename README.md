@@ -1,19 +1,20 @@
 # Black Screen Utility  
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A minimal fullscreen black page designed for secondary monitors, dark rooms, and distraction-free use.
+A minimal fullscreen black page designed to keep a secondary monitor dark and stable.  
+The tool was **conceptually designed by Henry van Megen** and **implemented by ChatGPT 5.1** using the functional specification described in `PROMPT.md`.
 
-This utility runs on **https://black.qmp-media.nl/** and includes:
-- A clock overlay (optional)
-- Three movement modes:
-  - **none** – instant jump every minute
-  - **slide-transition** – 59s ease-in / ease-out movement, no brightness changes
-  - **fade-transition** – fade-out at :59 and fade-in at :00 (OLED-friendly)
-- A **show-seconds** toggle
-- Full persistence via `localStorage` (except fullscreen state)
-- **NoSleep.js** to prevent the display from sleeping
+The repository contains:
 
-Everything is intentionally minimal so the monitor stays as dark as possible.
+- `index.html`  
+  The entire tool in one self-contained HTML file (HTML, CSS, JS).
+- `nosleep.min.js`  
+  Local NoSleep.js copy to optionally prevent the screen from sleeping.
+- `PROMPT.md`  
+  A system prompt describing the complete functional design.  
+  This file exists so future regenerations of `index.html` can be done deterministically.
+- `LICENSE`  
+  MIT license.
 
 ---
 
@@ -21,76 +22,72 @@ Everything is intentionally minimal so the monitor stays as dark as possible.
 
 ### Clock overlay
 Toggle via right-click menu:
-- Show Time
-  - slide-transition  
-  - fade-transition  
-  - show-seconds  
+- **Show Time**
+  - **slide-transition** (59 s ease-in/ease-out positional movement)
+  - **fade-transition** (fade-out at :59, fade-in at :00)
+  - **show-seconds** (toggle HH:MM vs HH:MM:SS)
 
-All active states appear **bold**.
+Active items are **bold**.  
+Transition options appear only when the timer is enabled.
 
 ### Fullscreen
-Three ways:
-- Doubleclick anywhere  
+- Double-click anywhere  
 - Right-click → Toggle Fullscreen  
-- Press **F11**
+- Or use F11  
 
-Fullscreen is not saved because browsers do not expose fullscreen exit events consistently and users often toggle it manually.
+Fullscreen is intentionally **not persisted**.
 
 ### Persistence
-Saved in `localStorage`:
-- `timerActive`
-- `transitionMode`
-- `showSeconds`
+Settings saved in `localStorage`:
+- Whether the timer is active  
+- Current transition mode (`none`, `slide`, `fade`)  
+- Whether seconds are shown  
 
 Not saved:
-- fullscreen mode
+- Fullscreen state
 
----
-
-## NoSleep.js
-A local copy (`nosleep.min.js`) is loaded from the project root.  
-This prevents the machine from turning off the screen while the tool is open.
+### NoSleep.js
+The page loads `nosleep.min.js` from the local directory.  
+This can prevent monitor sleep after the first user interaction if enabled.
 
 ---
 
 ## SEO
-The `<head>` section includes:
-- meta description  
+The `<head>` block includes:
+- description  
 - keywords  
 - canonical URL  
 - OpenGraph metadata  
-- responsive viewport  
+- viewport settings  
 
-This allows Google to index the page.
+This allows the project to be indexed properly by search engines.
 
 ---
 
 ## Installation
-Clone the repo and deploy to your webserver:
+Clone the repository and deploy the three files:
 
 ```
 index.html
 nosleep.min.js
-README.md
+PROMPT.md
 LICENSE
 ```
 
-Ensure correct MIME types for `.html` and `.js`.
+Place these on any static web server.
 
 ---
 
 ## Notes
-The page is designed to be extremely dark and stable, avoiding:
-- local-dimming pulses  
-- OLED brightness pumping  
-- distracting UI changes  
+The tool is intentionally extremely dark and stable to avoid:
+- brightness shifts  
+- local dimming fluctuations  
+- distracting motion  
 
-**slide-transition** is best for LCD backlit panels.  
-**fade-transition** is acceptable for OLED panels.
+Use **slide-transition** for LCD/backlit panels.  
+Use **fade-transition** for OLED panels.
 
 ---
 
 ## License
-This project is licensed under the MIT License.  
-See the `LICENSE` file for full text.
-
+MIT License — see `LICENSE` for details.
